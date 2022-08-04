@@ -1,7 +1,7 @@
 env.json
 __pycache__
-erudit
-model
+erudit/*
+model/*
 
 !erudit/.gitkeep
 !model/.gitkeep

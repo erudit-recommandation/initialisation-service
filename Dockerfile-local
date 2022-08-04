@@ -11,4 +11,4 @@ RUN pip3 install -r requirement.txt
 RUN python3 -m spacy download fr_core_news_sm
 RUN python3 init.py
 
-CMD [ "python3", "main.py -p"]
+CMD [ "python3", "app.py -dd"]

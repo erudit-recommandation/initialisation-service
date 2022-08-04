@@ -20,11 +20,11 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('-d', type=bool, required=False,
+    parser.add_argument('-d', required=False,
                         action="store_true", help="developpement mode")
-    parser.add_argument('-dd', type=bool, required=False,
+    parser.add_argument('-dd', required=False,
                         action="store_true", help="docker developpement mode")
-    parser.add_argument('-p', type=bool, required=False,
+    parser.add_argument('-p', required=False,
                         action="store_true", help="production mode")
     args = parser.parse_args()
 
@@ -53,6 +53,12 @@ if __name__ == "__main__":
             os.mkdir(doc_countvectors_path)
         except:
             print("doc_countvectors exist")
+
+        img_path = os.path.join(directory, "SOM_imgs")
+        try:
+            os.mkdir(img_path)
+        except:
+            print("img_path exist")
 
         create_doc_dict_count(
             directory=directory,
