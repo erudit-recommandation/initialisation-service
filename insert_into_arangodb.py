@@ -10,7 +10,7 @@ def delete_badly_formated_articles(row):
     return row["idproprio"] == "47054ac" or row["idproprio"] == "010109ar"
 
 
-def convert_df_to_arango(row, i):
+def convert_df_to_arango(cols, row, i):
     doc = {}
     if delete_badly_formated_articles(row):
         return None
@@ -84,7 +84,7 @@ def initialise_arango_db(directory, arangoURL, username, password, databaseName,
             chunk.reset_index(inplace=True)
             chunk.replace({np.nan: None}, inplace=True)
             for (_, row) in chunk.iterrows():
-                doc = convert_df_to_arango(row, i)
+                doc = convert_df_to_arango(cols, row, i)
                 if doc is None:
                     print("A badly formated article")
                 else:
@@ -92,7 +92,7 @@ def initialise_arango_db(directory, arangoURL, username, password, databaseName,
                         collection.insert(doc)
                     except:
                         print(
-                            "---an error happen when inserting with error {}---".format(row))
+                            "---an error happen when inserting with error {}---".format(i))
                     finally:
                         nDocumentAdded += 1
                     if nDocumentAdded % notice_freq == 0:

@@ -16,4 +16,6 @@ def send_d2v_model(url, password):
         "password": password,
     }
 
-    x = requests.post(url, files=files, data=obj)
+    r = requests.post(url, files=files, data=obj)
+
+    return r.status_code == requests.codes.ok

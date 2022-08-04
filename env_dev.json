@@ -8,7 +8,7 @@
     "max_rows_doc_parses": 200,
     "tfidf": {
         "max_features": 20000,
-        "min_df": 2,
+        "min_df": 2, 
         "max_df": 0.75,
         "vocab": null
     },

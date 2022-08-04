@@ -59,7 +59,7 @@ if __name__ == "__main__":
             os.mkdir(img_path)
         except:
             print("img_path exist")
-
+        
         create_doc_dict_count(
             directory=directory,
             number_words=env_variable["doc_dict"]["number_words"],
@@ -95,6 +95,7 @@ if __name__ == "__main__":
             directory=directory,
             n_rows=env_variable["max_rows_doc_parses"],
         )
+        
 
         initialise_arango_db(
             directory=directory,
@@ -105,8 +106,11 @@ if __name__ == "__main__":
             collectionName=env_variable["db"]["collectionName"],
             viewName=env_variable["db"]["viewName"],
         )
+        
 
-        send_d2v_model(
+        sended = send_d2v_model(
             url=env_variable["text_analysis_service"]["url"],
             password=env_variable["text_analysis_service"]["password"]
         )
+        if not sended:
+            raise Exception("was not able to send the model to the server")
