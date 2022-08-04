@@ -9,5 +9,8 @@ run:
 run-deploy:
 	python main.py -p
 
+run-inside-docker:
+	python main.py -dd
+
 run-bash-docker:
 	docker run --rm -it --entrypoint bash initialisation_service
