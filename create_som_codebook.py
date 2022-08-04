@@ -6,13 +6,12 @@ from pathlib import Path
 import os
 from gnomonics.persona_text import corpus_vectors, vectors_som, plot_persona, plot_persona_grid, plot_single_persona, plot_persona_talks
 
-directory = Path('./erudit')
-mapsize=[50,50] # [50,50], unless for A2 Poster [70,50]
+mapsize = [50, 50]  # [50,50], unless for A2 Poster [70,50]
 
 
-def create_som_codebook(n_row=100):
+def create_som_codebook(directory, n_rows):
     path = os.path.join(directory, 'doc_parse.csv')
-    df = pd.read_csv(path, encoding='utf-8', sep=';', nrows=n_row,
+    df = pd.read_csv(path, encoding='utf-8', sep=';', nrows=n_rows,
                      usecols=['author', 'title', 'titrerev', 'annee', 'idproprio', 'lemma'])
     corpus = df.lemma
 
@@ -38,7 +37,7 @@ def create_som_codebook(n_row=100):
 
     som_outpath = os.path.join(directory, 'doc_countvectors', 'som_mask')
     cb, bmu_wordmatrix = vectors_som(
-        vectors=X_arr.T, words=words, mapsize=mapsize, verbose='info', som_outpath=som_outpath)
+        vectors=X_arr.T, words=words, mapsize=mapsize, verbose='info', som_outpath=som_outpath, ask=False)
 
     path = os.path.join(directory, 'doc_countvectors', 'som_codebook.npz')
     scipy.sparse.save_npz(path, scipy.sparse.csr_matrix(cb))

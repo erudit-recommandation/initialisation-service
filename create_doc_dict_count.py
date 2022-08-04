@@ -2,11 +2,8 @@ from gensim.models.word2vec import Word2Vec
 import pandas as pd
 from pathlib import Path
 
-directory = Path('./erudit')
-number_words = 1000
 
-
-def create_doc_dict_count(n_rows=100):
+def create_doc_dict_count(directory, number_words, n_rows):
     path = Path('{}/doc_parse.csv'.format(directory))
     df = pd.read_csv(path, encoding='utf-8', sep=';', nrows=n_rows,
                      usecols=['author', 'title', 'titrerev', 'annee', 'idproprio', 'lemma'])
@@ -31,13 +28,14 @@ def create_doc_dict_count(n_rows=100):
                 total_examples=model.corpus_count, epochs=model.epochs)
     wv_model = model.wv
 
-    wrd,cnt = [],[]
+    wrd, cnt = [], []
     for index, word in enumerate(wv_model.index_to_key):
-        if index==number_words:
+        if index == number_words:
             break
         wrd.append(word)
-        cnt.append(wv_model.get_vecattr(word,'count'))
-        
-    word_counts = pd.DataFrame(data=[pd.Series(wrd,name='word'),pd.Series(cnt,name='count')]).T
+        cnt.append(wv_model.get_vecattr(word, 'count'))
+
+    word_counts = pd.DataFrame(
+        data=[pd.Series(wrd, name='word'), pd.Series(cnt, name='count')]).T
     path = Path('{}/doc_countvectors/doc_dict_counts.csv'.format(directory))
-    word_counts.to_csv(path,encoding='utf-8',sep=';')
+    word_counts.to_csv(path, encoding='utf-8', sep=';')

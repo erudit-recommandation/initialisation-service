@@ -5,18 +5,10 @@ from pathlib import Path
 from arango import ArangoClient
 import numpy as np
 
-directory = Path('./erudit')
-arangoURL = 'http://localhost:8529'
-username = 'root'
-password = 'rootpassword'
-databaseName = "erudit"
-collectionName = "articles"
-
-path = Path('{}/doc_parse_extended.csv'.format(directory))
-cols= ['author','title','titrerev','idproprio','ppage','sstitrerev','idissnnum','nonumero','theme','periode','annee','lemma','text', 'bmu', 'som_persona']
 
 def delete_badly_formated_articles(row):
     return row["idproprio"] == "47054ac" or row["idproprio"] == "010109ar"
+
 
 def convert_df_to_arango(row, i):
     doc = {}
@@ -28,19 +20,21 @@ def convert_df_to_arango(row, i):
         elif c == "sstitrerev":
             sstitrerev = row[c]
             sstitrerev = sstitrerev.split(" •")
-            sstitrerev = [rev if rev[0]!=" " else rev[1:] for rev in sstitrerev]
-            doc[c] =  sstitrerev
-            
+            sstitrerev = [rev if rev[0] != " " else rev[1:]
+                          for rev in sstitrerev]
+            doc[c] = sstitrerev
+
         else:
             doc[c] = row[c]
     doc['pandas_index'] = i
     return doc
 
 
+def initialise_arango_db(directory, arangoURL, username, password, databaseName, collectionName, viewName):
+    path = Path('{}/doc_parse_extended.csv'.format(directory))
+    cols = ['author', 'title', 'titrerev', 'idproprio', 'ppage', 'sstitrerev', 'idissnnum',
+            'nonumero', 'theme', 'periode', 'annee', 'lemma', 'text', 'bmu', 'som_persona']
 
-
-def initialise_arango_db():
-    
     client = ArangoClient(hosts=arangoURL)
     sys_db = client.db("_system", username=username, password=password)
     db = None
@@ -61,21 +55,21 @@ def initialise_arango_db():
         collection.add_persistent_index(fields=["title"])
         collection.add_persistent_index(fields=["author"])
         collection.add_persistent_index(fields=["pandas_index"], unique=True)
-        
-        db.create_view(name='article_analysis', view_type='arangosearch',
-    properties={
-        'links':{
-            collectionName:{
-                'fields':{
-                'text':{
-                    'analyzers': [
-                        'text_fr'
-                    ]
-                }
-                }
-            }
-        }
-    })
+
+        db.create_view(name=viewName, view_type='arangosearch',
+                       properties={
+                           'links': {
+                               collectionName: {
+                                   'fields': {
+                                       'text': {
+                                           'analyzers': [
+                                               'text_fr'
+                                           ]
+                                       }
+                                   }
+                               }
+                           }
+                       })
 
     chunksize = 1000
     notice_freq = 1000
@@ -88,8 +82,8 @@ def initialise_arango_db():
     with df as reader:
         for chunk in reader:
             chunk.reset_index(inplace=True)
-            chunk.replace({np.nan:None},inplace=True)
-            for (_, row) in chunk.iterrows(): 
+            chunk.replace({np.nan: None}, inplace=True)
+            for (_, row) in chunk.iterrows():
                 doc = convert_df_to_arango(row, i)
                 if doc is None:
                     print("A badly formated article")
@@ -97,11 +91,11 @@ def initialise_arango_db():
                     try:
                         collection.insert(doc)
                     except:
-                        print("---an error happen when inserting with error {}---".format(row))
+                        print(
+                            "---an error happen when inserting with error {}---".format(row))
                     finally:
-                        nDocumentAdded+=1
-                    if nDocumentAdded%notice_freq==0:
+                        nDocumentAdded += 1
+                    if nDocumentAdded % notice_freq == 0:
                         print("----{} document added----".format(nDocumentAdded))
-                i+=1
+                i += 1
     print("---- Done -----")
-

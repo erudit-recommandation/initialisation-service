@@ -10,10 +10,9 @@ import os
 import matplotlib.pyplot as plt
 import json
 
-directory = Path('./erudit')
 
 
-def create_som_model(n_rows=100, number_of_som_cells=300, info="info",sel_arr = None):
+def create_som_model(directory, n_rows, number_of_som_cells, info="info",sel_arr = None):
     path = os.path.join(directory, 'doc_countvectors', 'doc_countvectors.npz')
     X_arr = scipy.sparse.load_npz(path).toarray()
 

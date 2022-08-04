@@ -12,12 +12,11 @@ import warnings
 warnings.filterwarnings("ignore")
 
 
-directory = Path('./erudit')
 
 
-def create_som_grid(n_row=100):
+def create_som_grid(directory, n_rows):
     path = os.path.join(directory, 'doc_parse.csv')
-    corpus = pd.read_csv(path, encoding='utf-8', sep=';', nrows=n_row,
+    corpus = pd.read_csv(path, encoding='utf-8', sep=';', nrows=n_rows,
                          usecols=['title', 'titrerev', 'annee', 'idproprio'])
     corpus['author'] = [str(x) + '\n(' + str(int(y)) + ')' for x,
                         y in zip(corpus.titrerev, corpus.annee)]
@@ -28,7 +27,7 @@ def create_som_grid(n_row=100):
 
     som_outpath = os.path.join(directory, 'doc_countvectors', 'som_grid')
     df_cb_grid = persona_talks_grid(cb_vectors, corpus, gridsize=[50, 50], masksize=[
-                                    50, 50], som_outpath=som_outpath, plot_grid=False)
+                                    50, 50], som_outpath=som_outpath, plot_grid=False, ask=False)
 
     path = os.path.join(directory, 'doc_countvectors', 'som_grid_bmus.npy')
     np.save(path, df_cb_grid.bmu)

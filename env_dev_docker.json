@@ -1,0 +1,30 @@
+{
+    "working_directory": [
+        "./erudit"
+    ],
+    "doc_dict": {
+        "number_words": 1000
+    },
+    "max_rows_doc_parses": 200,
+    "tfidf": {
+        "max_features": 20000,
+        "min_df": 2,
+        "max_df": 0.75,
+        "vocab": null
+    },
+    "som": {
+        "number_of_som_cells": 300
+    },
+    "db": {
+        "url": "http://arangodb:8529",
+        "username": "root",
+        "password": "rootpassword",
+        "databaseName": "erudit",
+        "collectionName": "articles",
+        "viewName": "article_analysis"
+    },
+    "text_analysis_service": {
+        "url": "http://analysis:8092/model",
+        "password": "Pqpj3uUvT37dKToGNUapv"
+    }
+}

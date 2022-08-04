@@ -12,10 +12,10 @@ max_df = 0.75
 vocab = None
 
 
-def create_tfidf(n_row=100):
+def create_tfidf(directory, max_features, min_df, max_df, vocab, n_rows):
 
     path = os.path.join(directory, 'doc_parse.csv')
-    df = pd.read_csv(path, encoding='utf-8', sep=';', nrows=n_row,
+    df = pd.read_csv(path, encoding='utf-8', sep=';', nrows=n_rows,
                      usecols=['author', 'title', 'titrerev', 'annee', 'idproprio', 'lemma'])
     corpus = df.lemma
 
