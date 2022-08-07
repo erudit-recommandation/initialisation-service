@@ -2,6 +2,9 @@
     "working_directory": [
         "./erudit"
     ],
+    "steps": [
+        "SEND_ARTICLE_TO_DB_RAW"
+    ], // initialisation step, can take the values and does not need to be ordered :"BUILD_SOM","SEND_GEMSIM_TO_SERVER","BUILD_GEMSIM_MODEL","SEND_ARTICLE_TO_DB","SEND_ARTICLE_TO_DB_RAW","ALL"
     "doc_dict": {
         "number_words": 1000
     },
@@ -16,7 +19,7 @@
         "number_of_som_cells": 300
     },
     "db": {
-        "url": "http://arangodb:8529",
+        "url": "http://localhost:8529",
         "username": "root",
         "password": "rootpassword",
         "databaseName": "erudit",
@@ -24,7 +27,7 @@
         "viewName": "article_analysis"
     },
     "text_analysis_service": {
-        "url": "http://analysis:8092/model",
+        "url": "http://localhost:8092/model",
         "password": "Pqpj3uUvT37dKToGNUapv"
     }
 }

@@ -2,13 +2,16 @@
     "working_directory": [
         "./erudit"
     ],
+    "steps": [
+        "SEND_ARTICLE_TO_DB_RAW"
+    ],
     "doc_dict": {
         "number_words": 1000
     },
     "max_rows_doc_parses": 200,
     "tfidf": {
         "max_features": 20000,
-        "min_df": 2, 
+        "min_df": 2,
         "max_df": 0.75,
         "vocab": null
     },

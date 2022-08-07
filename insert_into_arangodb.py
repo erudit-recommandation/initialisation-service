@@ -30,10 +30,7 @@ def convert_df_to_arango(cols, row, i):
     return doc
 
 
-def initialise_arango_db(directory, arangoURL, username, password, databaseName, collectionName, viewName):
-    path = Path('{}/doc_parse_extended.csv'.format(directory))
-    cols = ['author', 'title', 'titrerev', 'idproprio', 'ppage', 'sstitrerev', 'idissnnum',
-            'nonumero', 'theme', 'periode', 'annee', 'lemma', 'text', 'bmu', 'som_persona']
+def initialise_arango_db(directory, arangoURL, username, password, databaseName, collectionName, viewName, raw=False):
 
     client = ArangoClient(hosts=arangoURL)
     sys_db = client.db("_system", username=username, password=password)
@@ -76,13 +73,25 @@ def initialise_arango_db(directory, arangoURL, username, password, databaseName,
     nDocumentAdded = 0
     i = 0
 
-    df = pd.read_csv(path, encoding='utf-8', chunksize=chunksize,
-                     sep=',', lineterminator='\n',)
+    cols = ['author', 'title', 'titrerev', 'idproprio', 'ppage', 'sstitrerev', 'idissnnum',
+            'nonumero', 'theme', 'periode', 'annee', 'lemma', 'text']
+    df = None
+    if raw:
+        path = Path('{}/doc_parse.csv'.format(directory))
+        df = pd.read_csv(path, encoding='utf-8', chunksize=chunksize, usecols=cols,
+                         sep=';', lineterminator='\n', index_col=False)
+    else:
+        cols.extend(["bmu", "som_persona"])
+
+        path = Path('{}/doc_parse_extended.csv'.format(directory))
+        df = pd.read_csv(path, encoding='utf-8', chunksize=chunksize, usecols=cols,
+                         sep=',', lineterminator='\n', index_col=False)
 
     with df as reader:
         for chunk in reader:
             chunk.reset_index(inplace=True)
             chunk.replace({np.nan: None}, inplace=True)
+            cols = list(chunk.columns)
             for (_, row) in chunk.iterrows():
                 doc = convert_df_to_arango(cols, row, i)
                 if doc is None:

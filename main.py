@@ -16,50 +16,48 @@ import os
 import argparse
 
 
-if __name__ == "__main__":
+parser = argparse.ArgumentParser()
 
-    parser = argparse.ArgumentParser()
+parser.add_argument('-d', required=False,
+                    action="store_true", help="developpement mode")
+parser.add_argument('-dd', required=False,
+                    action="store_true", help="docker developpement mode")
+parser.add_argument('-p', required=False,
+                    action="store_true", help="production mode")
+args = parser.parse_args()
 
-    parser.add_argument('-d', required=False,
-                        action="store_true", help="developpement mode")
-    parser.add_argument('-dd', required=False,
-                        action="store_true", help="docker developpement mode")
-    parser.add_argument('-p', required=False,
-                        action="store_true", help="production mode")
-    args = parser.parse_args()
+env_variable = None
+if args.d:
+    print("developpement mode")
+    with open(Path("./env_dev.json"), 'r') as f:
+        env_variable = json.load(f)
+elif args.dd:
+    print("developpement mode with docker")
+    with open(Path("./env_dev_docker.json"), 'r') as f:
+        env_variable = json.load(f)
+elif args.p:
+    print("production mode")
+    with open(Path("./env.json"), 'r') as f:
+        env_variable = json.load(f)
+else:
+    print("developpement mode")
+    with open(Path("./env_dev.json"), 'r') as f:
+        env_variable = json.load(f)
 
-    env_variable = None
-    if args.d:
-        print("developpement mode")
-        with open(Path("./env_dev.json"), 'r') as f:
-            env_variable = json.load(f)
-    elif args.dd:
-        print("developpement mode with docker")
-        with open(Path("./env_dev_docker.json"), 'r') as f:
-            env_variable = json.load(f)
-    elif args.p:
-        print("production mode")
-        with open(Path("./env.json"), 'r') as f:
-            env_variable = json.load(f)
-    else:
-        print("developpement mode")
-        with open(Path("./env_dev.json"), 'r') as f:
-            env_variable = json.load(f)
+for directory in env_variable["working_directory"]:
 
-    for directory in env_variable["working_directory"]:
+    doc_countvectors_path = os.path.join(directory, "doc_countvectors")
+    try:
+        os.mkdir(doc_countvectors_path)
+    except:
+        print("doc_countvectors exist")
 
-        doc_countvectors_path = os.path.join(directory, "doc_countvectors")
-        try:
-            os.mkdir(doc_countvectors_path)
-        except:
-            print("doc_countvectors exist")
-
-        img_path = os.path.join(directory, "SOM_imgs")
-        try:
-            os.mkdir(img_path)
-        except:
-            print("img_path exist")
-        
+    img_path = os.path.join(directory, "SOM_imgs")
+    try:
+        os.mkdir(img_path)
+    except:
+        print("img_path exist")
+    if "BUILD_SOM" in env_variable["steps"] or "ALL" in env_variable["steps"]:
         create_doc_dict_count(
             directory=directory,
             number_words=env_variable["doc_dict"]["number_words"],
@@ -95,8 +93,8 @@ if __name__ == "__main__":
             directory=directory,
             n_rows=env_variable["max_rows_doc_parses"],
         )
-        
 
+    if "SEND_ARTICLE_TO_DB" in env_variable["steps"] or "ALL" in env_variable["steps"]:
         initialise_arango_db(
             directory=directory,
             arangoURL=env_variable["db"]["url"],
@@ -106,11 +104,23 @@ if __name__ == "__main__":
             collectionName=env_variable["db"]["collectionName"],
             viewName=env_variable["db"]["viewName"],
         )
-        
+    elif "SEND_ARTICLE_TO_DB_RAW" in env_variable["steps"]:
+        initialise_arango_db(
+            directory=directory,
+            arangoURL=env_variable["db"]["url"],
+            username=env_variable["db"]["username"],
+            password=env_variable["db"]["password"],
+            databaseName=env_variable["db"]["databaseName"],
+            collectionName=env_variable["db"]["collectionName"],
+            viewName=env_variable["db"]["viewName"],
+            raw=True,
+        )
 
+    if "SEND_GEMSIM_TO_SERVER" in env_variable["steps"] or "ALL" in env_variable["steps"]:
         sended = send_d2v_model(
             url=env_variable["text_analysis_service"]["url"],
             password=env_variable["text_analysis_service"]["password"]
         )
         if not sended:
             raise Exception("was not able to send the model to the server")
+    print("----------------------- DONE ----------------------- ")
