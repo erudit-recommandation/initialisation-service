@@ -6,7 +6,7 @@ Application qui permet de générer et de publier tous les modèles nécessaires
 Les dépendances sont dans le fichier `requirement.txt`, ainsi que le module `fr_core_news_sm` de `spacy` et les modules `punkt` et `stopwords`. Il suffit de lancer la commande `make install` pour tout installer.
 
 # Usage
-L'application est gérée par les fichiers `env.json` ou `env_dev.json`, ceux caractérise la construction des modèles et leur déploiement dans les services. Le champ `step` gère les opérations que l'application va effectuer les choix sont les suivants: 
+L'application est gérée par les fichiers `env.json` ou `env_dev.json`, ceux caractérise la construction des modèles et leur déploiement dans les services. Le champ `step` gère les opérations que l'application va effectuer les choix sont les suivants et l'ordre n'a pas d'importance: 
 - "BUILD_SOM" => construit le modèle SOM
 - "SEND_GEMSIM_TO_SERVER" => envoie le modèle `gemsim` au serveur
 - "BUILD_GEMSIM_MODEL" => construit le modèle `gemsim`
@@ -16,6 +16,7 @@ L'application est gérée par les fichiers `env.json` ou `env_dev.json`, ceux ca
 
 Afin de lancer l'application, il suffit de simplement exécuter la commande `make run` afin de la configuration de développement (`env_dev.json`), pour lancer l'application en mode déploiement il faut lancer la commande `make run-deploy`.
 
+## Exemple d'un fichier `env.json`
 ```json
 {
    "working_data": [
@@ -40,7 +41,7 @@ Afin de lancer l'application, il suffit de simplement exécuter la commande `mak
     ],
     "steps": [
         "SEND_ARTICLE_TO_DB_RAW"
-    ], // initialisation step, can take the values and does not need to be ordered :"BUILD_SOM","SEND_GEMSIM_TO_SERVER","BUILD_GEMSIM_MODEL","SEND_ARTICLE_TO_DB","SEND_ARTICLE_TO_DB_RAW","ALL"
+    ], 
     "doc_dict": {
         "number_words": 1000
     },
