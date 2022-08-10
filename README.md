@@ -14,6 +14,8 @@ L'application est gérée par les fichiers `env.json` ou `env_dev.json`, ceux ca
 - "SEND_ARTICLE_TO_DB_RAW" => envoie simplement les articles dans la base de données
 - "ALL" => effectue toutes les opérations
 
+`max_rows_doc_parses` peut être assigné à `null` afin de prendre toutes les lignes des `doc_parse.csv`
+
 Afin de lancer l'application, il suffit de simplement exécuter la commande `make run` afin de la configuration de développement (`env_dev.json`), pour lancer l'application en mode déploiement il faut lancer la commande `make run-deploy`.
 
 ## Exemple d'un fichier `env.json`
