@@ -44,7 +44,8 @@ else:
     with open(Path("./env_dev.json"), 'r') as f:
         env_variable = json.load(f)
 
-for directory in env_variable["working_directory"]:
+for data in env_variable["working_data"]:
+    directory = data["directory"]
 
     doc_countvectors_path = os.path.join(directory, "doc_countvectors")
     try:
@@ -97,6 +98,7 @@ for directory in env_variable["working_directory"]:
     if "SEND_ARTICLE_TO_DB" in env_variable["steps"] or "ALL" in env_variable["steps"]:
         initialise_arango_db(
             directory=directory,
+            cols=data["doc_parse_cols"],
             arangoURL=env_variable["db"]["url"],
             username=env_variable["db"]["username"],
             password=env_variable["db"]["password"],
@@ -107,6 +109,7 @@ for directory in env_variable["working_directory"]:
     elif "SEND_ARTICLE_TO_DB_RAW" in env_variable["steps"]:
         initialise_arango_db(
             directory=directory,
+            cols=data["doc_parse_cols"],
             arangoURL=env_variable["db"]["url"],
             username=env_variable["db"]["username"],
             password=env_variable["db"]["password"],

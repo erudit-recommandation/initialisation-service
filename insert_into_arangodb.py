@@ -30,7 +30,7 @@ def convert_df_to_arango(cols, row, i):
     return doc
 
 
-def initialise_arango_db(directory, arangoURL, username, password, databaseName, collectionName, viewName, raw=False):
+def initialise_arango_db(directory, cols, arangoURL, username, password, databaseName, collectionName, viewName, raw=False):
 
     client = ArangoClient(hosts=arangoURL)
     sys_db = client.db("_system", username=username, password=password)
@@ -73,8 +73,6 @@ def initialise_arango_db(directory, arangoURL, username, password, databaseName,
     nDocumentAdded = 0
     i = 0
 
-    cols = ['author', 'title', 'titrerev', 'idproprio', 'ppage', 'sstitrerev', 'idissnnum',
-            'nonumero', 'theme', 'periode', 'annee', 'lemma', 'text']
     df = None
     if raw:
         path = Path('{}/doc_parse.csv'.format(directory))

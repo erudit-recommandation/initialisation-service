@@ -1,6 +1,23 @@
 {
-    "working_directory": [
-        "./erudit"
+    "working_data": [
+        {
+            "directory": "./erudit",
+            "doc_parse_cols": [
+                "author",
+                "title",
+                "titrerev",
+                "idproprio",
+                "ppage",
+                "sstitrerev",
+                "idissnnum",
+                "nonumero",
+                "theme",
+                "periode",
+                "annee",
+                "lemma",
+                "text"
+            ]
+        }
     ],
     "steps": [
         "SEND_ARTICLE_TO_DB_RAW"
