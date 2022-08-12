@@ -4,7 +4,7 @@ from create_som_grid import create_som_grid
 from create_som_codebook import create_som_codebook
 from create_som_model import create_som_model
 
-from insert_into_arangodb import initialise_arango_db
+from insert_into_arangodb import insert_articles, insert_sentences
 from create_som_images import create_som_images
 
 from send_d2v_model import send_d2v_model
@@ -79,24 +79,14 @@ for data in env_variable["working_data"]:
             n_rows=env_variable["max_rows_doc_parses"],
         )
 
-        create_som_grid(
-            directory=directory,
-            n_rows=env_variable["max_rows_doc_parses"],
-        )
-
-        create_som_model(
-            directory=directory,
-            n_rows=env_variable["max_rows_doc_parses"],
-            number_of_som_cells=env_variable["som"]["number_of_som_cells"]
-        )
-
+    if "CREATE_PERSONA_IMAGE" in env_variable["steps"] or "ALL" in env_variable["steps"]:
         create_som_images(
             directory=directory,
             n_rows=env_variable["max_rows_doc_parses"],
         )
 
     if "SEND_ARTICLE_TO_DB" in env_variable["steps"] or "ALL" in env_variable["steps"]:
-        initialise_arango_db(
+        insert_articles(
             directory=directory,
             cols=data["doc_parse_cols"],
             arangoURL=env_variable["db"]["url"],
@@ -107,7 +97,7 @@ for data in env_variable["working_data"]:
             viewName=env_variable["db"]["viewName"],
         )
     elif "SEND_ARTICLE_TO_DB_RAW" in env_variable["steps"]:
-        initialise_arango_db(
+        insert_articles(
             directory=directory,
             cols=data["doc_parse_cols"],
             arangoURL=env_variable["db"]["url"],
@@ -117,6 +107,15 @@ for data in env_variable["working_data"]:
             collectionName=env_variable["db"]["collectionName"],
             viewName=env_variable["db"]["viewName"],
             raw=True,
+        )
+    if "SEND_SENTENCES_TO_DB" in env_variable["steps"] or "ALL" in env_variable["steps"]:
+        insert_sentences(
+            directory=directory,
+            arangoURL=env_variable["db"]["url"],
+            username=env_variable["db"]["username"],
+            password=env_variable["db"]["password"],
+            databaseName=env_variable["db"]["databaseName"],
+            collectionName=env_variable["db"]["sentencesCollectionName"],
         )
 
     if "SEND_GEMSIM_TO_SERVER" in env_variable["steps"] or "ALL" in env_variable["steps"]:

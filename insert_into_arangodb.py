@@ -30,7 +30,7 @@ def convert_df_to_arango(cols, row, i):
     return doc
 
 
-def initialise_arango_db(directory, cols, arangoURL, username, password, databaseName, collectionName, viewName, raw=False):
+def insert_articles(directory, cols, arangoURL, username, password, databaseName, collectionName, viewName, raw=False):
 
     client = ArangoClient(hosts=arangoURL)
     sys_db = client.db("_system", username=username, password=password)
@@ -69,9 +69,6 @@ def initialise_arango_db(directory, cols, arangoURL, username, password, databas
                        })
 
     chunksize = 1000
-    notice_freq = 1000
-    nDocumentAdded = 0
-    i = 0
 
     df = None
     if raw:
@@ -84,6 +81,14 @@ def initialise_arango_db(directory, cols, arangoURL, username, password, databas
         path = Path('{}/doc_parse_extended.csv'.format(directory))
         df = pd.read_csv(path, encoding='utf-8', chunksize=chunksize, usecols=cols,
                          sep=',', lineterminator='\n', index_col=False)
+    insert_into_db(df, chunksize, collection)
+
+
+def insert_into_db(df, chunksize, collection):
+
+    notice_freq = 1000
+    nDocumentAdded = 0
+    i = 0
 
     with df as reader:
         for chunk in reader:
@@ -97,12 +102,39 @@ def initialise_arango_db(directory, cols, arangoURL, username, password, databas
                 else:
                     try:
                         collection.insert(doc)
-                    except:
+                    except Exception as e:
                         print(
-                            "---an error happen when inserting with error {}---".format(i))
+                            "---an error happen when inserting with error {} with document {}---".format(e, i))
                     finally:
                         nDocumentAdded += 1
                     if nDocumentAdded % notice_freq == 0:
                         print("----{} document added----".format(nDocumentAdded))
                 i += 1
     print("---- Done -----")
+
+
+def insert_sentences(directory, arangoURL, username, password, databaseName, collectionName):
+    client = ArangoClient(hosts=arangoURL)
+    sys_db = client.db("_system", username=username, password=password)
+    db = None
+    if not sys_db.has_database(databaseName):
+        sys_db.create_database(databaseName)
+        db = client.db(databaseName, username=username, password=password)
+    else:
+        print("the database already exist")
+        db = client.db(databaseName, username=username, password=password)
+
+    collection = None
+    if db.has_collection(collectionName):
+        collection = db.collection(collectionName)
+    else:
+        collection = db.create_collection(collectionName)
+        collection.add_fulltext_index(fields=["text"])
+        collection.add_persistent_index(fields=["idproprio"])
+        collection.add_persistent_index(fields=["pandas_index"], unique=True)
+
+    chunksize = 1000
+    path = Path('{}/doc_sent_parse.csv'.format(directory))
+    df = pd.read_csv(path, encoding='utf-8', chunksize=chunksize,
+                     sep=';', lineterminator='\n', index_col=False)
+    insert_into_db(df, chunksize, collection)

@@ -1,6 +1,5 @@
 run:
 	python main.py -d
-	
 run-deploy:
 	python main.py -p
 

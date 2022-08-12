@@ -20,7 +20,8 @@
         }
     ],
     "steps": [
-        "SEND_ARTICLE_TO_DB_RAW"
+        "BUILD_SOM",
+        "CREATE_PERSONA_IMAGE"
     ],
     "doc_dict": {
         "number_words": 1000
@@ -32,15 +33,13 @@
         "max_df": 0.75,
         "vocab": null
     },
-    "som": {
-        "number_of_som_cells": 300
-    },
     "db": {
         "url": "http://localhost:8529",
         "username": "root",
         "password": "rootpassword",
         "databaseName": "erudit",
         "collectionName": "articles",
+        "sentencesCollectionName": "sentences",
         "viewName": "article_analysis"
     },
     "text_analysis_service": {

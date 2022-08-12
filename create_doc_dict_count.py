@@ -30,8 +30,9 @@ def create_doc_dict_count(directory, number_words, n_rows):
 
     wrd, cnt = [], []
     for index, word in enumerate(wv_model.index_to_key):
-        if index == number_words:
-            break
+        if number_words is not None:
+            if index == number_words:
+                break
         wrd.append(word)
         cnt.append(wv_model.get_vecattr(word, 'count'))
 
