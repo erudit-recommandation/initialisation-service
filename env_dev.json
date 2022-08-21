@@ -1,43 +1,92 @@
 {
-    "working_data": [
+    "corpus": [
         {
-            "directory": "./erudit",
-            "doc_parse_cols": [
-                "author",
-                "title",
-                "titrerev",
-                "idproprio",
-                "ppage",
-                "sstitrerev",
-                "idissnnum",
-                "nonumero",
-                "theme",
-                "periode",
-                "annee",
-                "lemma",
-                "text"
+            "active": true,
+            "name": "erudit",
+            "database_name": "erudit",
+            "working_data": {
+                "directory": "./data/erudit",
+                "doc_parse_cols": [
+                    "author",
+                    "title",
+                    "titrerev",
+                    "idproprio",
+                    "ppage",
+                    "sstitrerev",
+                    "idissnnum",
+                    "nonumero",
+                    "theme",
+                    "periode",
+                    "annee"
+                ]
+            },
+            "steps": [
+                "SEND_ARTICLE_TO_DB",
+                "EXTEND_DB_WITH_BMU",
+                "EXTEND_ARTICLE_DB_WITH_PERSONA"
+            ]
+        },
+        {
+            "active": true,
+            "name": "Théorie de l'architecture française",
+            "database_name": "libraryFr",
+            "working_data": {
+                "directory": "./data/Bibliotheque FR",
+                "doc_parse_cols": [
+                    "author",
+                    "title",
+                    "idproprio",
+                    "date"
+                ]
+            },
+            "steps": [
+                "SEND_ARTICLE_TO_DB",
+                "EXTEND_DB_WITH_BMU",
+                "EXTEND_ARTICLE_DB_WITH_PERSONA"
+            ]
+        },
+        {
+            "active": true,
+            "name": "Théorie de l'architecture anglaise",
+            "database_name": "libraryEng",
+            "working_data": {
+                "directory": "./data/Library EN",
+                "doc_parse_cols": [
+                    "author",
+                    "title",
+                    "idproprio",
+                    "date"
+                ]
+            },
+            "steps": [
+                "SEND_ARTICLE_TO_DB",
+                "EXTEND_DB_WITH_BMU",
+                "EXTEND_ARTICLE_DB_WITH_PERSONA"
+            ]
+        },
+        {
+            "active": true,
+            "name": "Xenotheka",
+            "database_name": "xenotheka",
+            "working_data": {
+                "directory": "./data/Xenotheka",
+                "doc_parse_cols": [
+                    "author",
+                    "title",
+                    "idproprio"
+                ]
+            },
+            "steps": [
+                "SEND_ARTICLE_TO_DB",
+                "EXTEND_DB_WITH_BMU",
+                "EXTEND_ARTICLE_DB_WITH_PERSONA"
             ]
         }
     ],
-    "steps": [
-        "BUILD_SOM",
-        "CREATE_PERSONA_IMAGE"
-    ],
-    "doc_dict": {
-        "number_words": 1000
-    },
-    "max_rows_doc_parses": 200,
-    "tfidf": {
-        "max_features": 20000,
-        "min_df": 2,
-        "max_df": 0.75,
-        "vocab": null
-    },
     "db": {
         "url": "http://localhost:8529",
         "username": "root",
         "password": "rootpassword",
-        "databaseName": "erudit",
         "collectionName": "articles",
         "sentencesCollectionName": "sentences",
         "viewName": "article_analysis"

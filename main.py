@@ -4,7 +4,7 @@ from create_som_grid import create_som_grid
 from create_som_codebook import create_som_codebook
 from create_som_model import create_som_model
 
-from insert_into_arangodb import insert_articles, insert_sentences
+from insert_into_arangodb import insert_articles, insert_sentences, insert_images, insert_bmu
 from create_som_images import create_som_images
 
 from send_d2v_model import send_d2v_model
@@ -44,85 +44,76 @@ else:
     with open(Path("./env_dev.json"), 'r') as f:
         env_variable = json.load(f)
 
-for data in env_variable["working_data"]:
-    directory = data["directory"]
+for corpus in env_variable["corpus"]:
+    if corpus["active"]:
+        directory = corpus["working_data"]["directory"]
 
-    doc_countvectors_path = os.path.join(directory, "doc_countvectors")
-    try:
-        os.mkdir(doc_countvectors_path)
-    except:
-        print("doc_countvectors exist")
+        img_path = os.path.join(directory, "SOM_imgs")
 
-    img_path = os.path.join(directory, "SOM_imgs")
-    try:
-        os.mkdir(img_path)
-    except:
-        print("img_path exist")
-    if "BUILD_SOM" in env_variable["steps"] or "ALL" in env_variable["steps"]:
-        create_doc_dict_count(
-            directory=directory,
-            number_words=env_variable["doc_dict"]["number_words"],
-            n_rows=env_variable["max_rows_doc_parses"]
-        )
+        model_path = os.path.join(directory, "model")
 
-        create_tfidf(
-            directory=directory,
-            max_features=env_variable["tfidf"]["max_features"],
-            min_df=env_variable["tfidf"]["min_df"],
-            max_df=env_variable["tfidf"]["max_df"],
-            vocab=env_variable["tfidf"]["vocab"],
-            n_rows=env_variable["max_rows_doc_parses"],
-        )
+        if "SEND_ARTICLE_TO_DB" in corpus["steps"] or "SEND_ALL" in corpus["steps"]:
+            try:
+                insert_articles(
+                    directory=directory,
+                    cols=corpus["working_data"]["doc_parse_cols"],
+                    arangoURL=env_variable["db"]["url"],
+                    username=env_variable["db"]["username"],
+                    password=env_variable["db"]["password"],
+                    databaseName=corpus["database_name"],
+                    collectionName=env_variable["db"]["collectionName"],
+                    viewName=env_variable["db"]["viewName"],
+                    raw=True,
+                )
+            except Exception as e:
+                print("SEND_ARTICLE_TO_DB failed: ", e)
 
-        create_som_codebook(
-            directory=directory,
-            n_rows=env_variable["max_rows_doc_parses"],
-        )
+        if "SEND_SENTENCES_TO_DB" in corpus["steps"] or "SEND_ALL" in corpus["steps"]:
+            try:
+                insert_sentences(
+                    directory=directory,
+                    arangoURL=env_variable["db"]["url"],
+                    username=env_variable["db"]["username"],
+                    password=env_variable["db"]["password"],
+                    databaseName=corpus["database_name"],
+                    collectionName=env_variable["db"]["sentencesCollectionName"],
+                    viewName=env_variable["db"]["viewName"],
+                )
+            except Exception as e:
+                print("SEND_SENTENCES_TO_DB failed: ", e)
 
-    if "CREATE_PERSONA_IMAGE" in env_variable["steps"] or "ALL" in env_variable["steps"]:
-        create_som_images(
-            directory=directory,
-            n_rows=env_variable["max_rows_doc_parses"],
-        )
+        if "EXTEND_ARTICLE_DB_WITH_PERSONA" in corpus["steps"] or "SEND_ALL" in corpus["steps"]:
+            try:
+                insert_images(
+                    directory=directory,
+                    arangoURL=env_variable["db"]["url"],
+                    username=env_variable["db"]["username"],
+                    password=env_variable["db"]["password"],
+                    databaseName=corpus["database_name"],
+                    collectionName=env_variable["db"]["collectionName"],
+                    img_repertory=img_path
+                )
+            except Exception as e:
+                print("EXTEND_ARTICLE_DB_WITH_PERSONA failed: ", e)
 
-    if "SEND_ARTICLE_TO_DB" in env_variable["steps"] or "ALL" in env_variable["steps"]:
-        insert_articles(
-            directory=directory,
-            cols=data["doc_parse_cols"],
-            arangoURL=env_variable["db"]["url"],
-            username=env_variable["db"]["username"],
-            password=env_variable["db"]["password"],
-            databaseName=env_variable["db"]["databaseName"],
-            collectionName=env_variable["db"]["collectionName"],
-            viewName=env_variable["db"]["viewName"],
-        )
-    elif "SEND_ARTICLE_TO_DB_RAW" in env_variable["steps"]:
-        insert_articles(
-            directory=directory,
-            cols=data["doc_parse_cols"],
-            arangoURL=env_variable["db"]["url"],
-            username=env_variable["db"]["username"],
-            password=env_variable["db"]["password"],
-            databaseName=env_variable["db"]["databaseName"],
-            collectionName=env_variable["db"]["collectionName"],
-            viewName=env_variable["db"]["viewName"],
-            raw=True,
-        )
-    if "SEND_SENTENCES_TO_DB" in env_variable["steps"] or "ALL" in env_variable["steps"]:
-        insert_sentences(
-            directory=directory,
-            arangoURL=env_variable["db"]["url"],
-            username=env_variable["db"]["username"],
-            password=env_variable["db"]["password"],
-            databaseName=env_variable["db"]["databaseName"],
-            collectionName=env_variable["db"]["sentencesCollectionName"],
-        )
+        if "EXTEND_DB_WITH_BMU" in corpus["steps"] or "SEND_ALL" in corpus["steps"]:
+            try:
+                insert_bmu(
+                    directory=directory,
+                    arangoURL=env_variable["db"]["url"],
+                    username=env_variable["db"]["username"],
+                    password=env_variable["db"]["password"],
+                    databaseName=corpus["database_name"],
+                    collectionName=env_variable["db"]["collectionName"],
+                )
+            except Exception as e:
+                print("EXTEND_DB_WITH_BMU failed: ", e)
 
-    if "SEND_GEMSIM_TO_SERVER" in env_variable["steps"] or "ALL" in env_variable["steps"]:
-        sended = send_d2v_model(
-            url=env_variable["text_analysis_service"]["url"],
-            password=env_variable["text_analysis_service"]["password"]
-        )
-        if not sended:
-            raise Exception("was not able to send the model to the server")
+        if "SEND_GEMSIM_TO_SERVER" in corpus["steps"] or "SEND_ALL" in corpus["steps"]:
+            sended = send_d2v_model(
+                url=env_variable["text_analysis_service"]["url"],
+                password=env_variable["text_analysis_service"]["password"]
+            )
+            if not sended:
+                raise Exception("was not able to send the model to the server")
     print("----------------------- DONE ----------------------- ")

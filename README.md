@@ -7,14 +7,12 @@ Les dépendances sont dans le fichier `requirement.txt`, ainsi que le module `fr
 
 # Usage
 L'application est gérée par les fichiers `env.json` ou `env_dev.json`, ceux caractérise la construction des modèles et leur déploiement dans les services. Le champ `step` gère les opérations que l'application va effectuer les choix sont les suivants et l'ordre n'a pas d'importance: 
-- "BUILD_SOM" => construit le modèle SOM
-- "SEND_gensim_TO_SERVER" => envoie le modèle `gensim` au serveur
-- "BUILD_GENSIM_MODEL" => construit le modèle `gensim`
+- "SEND_GENSIM_TO_SERVER" => envoie le modèle `gensim` au serveur
 - "SEND_ARTICLE_TO_DB" => envoie les articles et les informations qui s'y rattachent dans la base de données
-- "SEND_ARTICLE_TO_DB_RAW" => envoie simplement les articles dans la base de données
-- "ALL" => effectue toutes les opérations
+- "SEND_ALL" => effectue toutes les opérations
 - "SEND_SENTENCES_TO_DB" => envoie les phrase à la base de donnée
-- "CREATE_PERSONA_IMAGE" => création des images pour les persona
+- "EXTEND_ARTICLE_DB_WITH_PERSONA" => Ajoutes les images des persona dans la base de données
+- "EXTEND_DB_WITH_BMU"=> Ajoutes les bmu dans la base de données
 
 `max_rows_doc_parses` peut être assigné à `null` afin de prendre toutes les lignes des `doc_parse.csv`
 

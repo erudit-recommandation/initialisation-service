@@ -1,9 +1,10 @@
 env.json
 __pycache__
-erudit/*
+data/*
 model/*
 dist
 build
 
-!erudit/.gitkeep
+
+!data/.gitkeep
 !model/.gitkeep
