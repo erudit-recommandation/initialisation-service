@@ -1,8 +1,8 @@
 {
     "corpus": [
         {
-            "active": true,
-            "name": "erudit",
+            "active": false,
+            "name": "érudit",
             "database_name": "erudit",
             "working_data": {
                 "directory": "./data/erudit",
@@ -21,10 +21,9 @@
                 ]
             },
             "steps": [
-                "SEND_ARTICLE_TO_DB",
-                "EXTEND_DB_WITH_BMU",
                 "EXTEND_ARTICLE_DB_WITH_PERSONA"
-            ]
+            ],
+            "large_gensim":true
         },
         {
             "active": true,
@@ -40,10 +39,9 @@
                 ]
             },
             "steps": [
-                "SEND_ARTICLE_TO_DB",
-                "EXTEND_DB_WITH_BMU",
-                "EXTEND_ARTICLE_DB_WITH_PERSONA"
-            ]
+                "SEND_GENSIM_TO_SERVER"
+            ],
+            "large_gensim":false
         },
         {
             "active": true,
@@ -59,10 +57,9 @@
                 ]
             },
             "steps": [
-                "SEND_ARTICLE_TO_DB",
-                "EXTEND_DB_WITH_BMU",
-                "EXTEND_ARTICLE_DB_WITH_PERSONA"
-            ]
+                "SEND_GENSIM_TO_SERVER"
+            ],
+            "large_gensim":false
         },
         {
             "active": true,
@@ -77,10 +74,9 @@
                 ]
             },
             "steps": [
-                "SEND_ARTICLE_TO_DB",
-                "EXTEND_DB_WITH_BMU",
-                "EXTEND_ARTICLE_DB_WITH_PERSONA"
-            ]
+                "SEND_GENSIM_TO_SERVER"
+            ],
+            "large_gensim":true
         }
     ],
     "db": {

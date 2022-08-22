@@ -84,6 +84,9 @@ for corpus in env_variable["corpus"]:
 
         if "EXTEND_ARTICLE_DB_WITH_PERSONA" in corpus["steps"] or "SEND_ALL" in corpus["steps"]:
             try:
+                idproprioImages = True
+                if corpus["name"] == "érudit":
+                    idproprioImages = False
                 insert_images(
                     directory=directory,
                     arangoURL=env_variable["db"]["url"],
@@ -91,7 +94,8 @@ for corpus in env_variable["corpus"]:
                     password=env_variable["db"]["password"],
                     databaseName=corpus["database_name"],
                     collectionName=env_variable["db"]["collectionName"],
-                    img_repertory=img_path
+                    img_repertory=img_path,
+                    idproprioImages=idproprioImages,
                 )
             except Exception as e:
                 print("EXTEND_ARTICLE_DB_WITH_PERSONA failed: ", e)
@@ -109,11 +113,15 @@ for corpus in env_variable["corpus"]:
             except Exception as e:
                 print("EXTEND_DB_WITH_BMU failed: ", e)
 
-        if "SEND_GEMSIM_TO_SERVER" in corpus["steps"] or "SEND_ALL" in corpus["steps"]:
+        if "SEND_GENSIM_TO_SERVER" in corpus["steps"] or "SEND_ALL" in corpus["steps"]:
             sended = send_d2v_model(
                 url=env_variable["text_analysis_service"]["url"],
-                password=env_variable["text_analysis_service"]["password"]
+                password=env_variable["text_analysis_service"]["password"],
+                largeModel=corpus["large_gensim"],
+                database_name=corpus["database_name"],
+                directory = corpus["working_data"]["directory"]
             )
             if not sended:
                 raise Exception("was not able to send the model to the server")
-    print("----------------------- DONE ----------------------- ")
+        print("----------------------- DONE {} -----------------------".format(corpus["name"]))
+print("--- LEAVING ---")

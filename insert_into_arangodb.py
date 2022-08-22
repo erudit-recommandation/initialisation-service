@@ -91,8 +91,8 @@ def insert_into_db(df, chunksize, collection, updateBMU=False):
                 else:
                     try:
                         if updateBMU:
-                            collection.update_match({'idproprio': doc["idproprio"]}, {
-                                                    'bmu': doc["key_bmu"]})
+                            query, update= {'idproprio': doc["idproprio"]}, {'bmu': int(doc["key_bmu"])}
+                            collection.update_match(query, update)
                         else:
                             collection.insert(doc)
                     except Exception as e:
@@ -149,7 +149,7 @@ def insert_sentences(directory, arangoURL, username, password, databaseName, col
     insert_into_db(df, chunksize, collection)
 
 
-def insert_images(directory, arangoURL, username, password, databaseName, collectionName, img_repertory):
+def insert_images(directory, arangoURL, username, password, databaseName, collectionName, img_repertory, idproprioImages=False):
     client = ArangoClient(hosts=arangoURL)
     sys_db = client.db("_system", username=username, password=password)
     db = None
@@ -176,6 +176,9 @@ def insert_images(directory, arangoURL, username, password, databaseName, collec
                     svg = f.read()
                 img_name_split = img.split(".")
                 pandas_index = int(img_name_split[0])
+                if idproprioImages:
+                    pandas_index-=1
+                    
                 collection.update_match(
                     {'pandas_index': pandas_index}, {'persona_svg': svg})
                 if nDocumentAdded % notice_freq == 0:
