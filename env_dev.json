@@ -23,7 +23,7 @@
             "steps": [
                 "EXTEND_ARTICLE_DB_WITH_PERSONA"
             ],
-            "large_gensim":true
+            "large_gensim": true
         },
         {
             "active": false,
@@ -43,7 +43,7 @@
                 "EXTEND_ARTICLE_DB_WITH_PERSONA",
                 "EXTEND_DB_WITH_BMU"
             ],
-            "large_gensim":false
+            "large_gensim": false
         },
         {
             "active": false,
@@ -64,7 +64,7 @@
                 "EXTEND_DB_WITH_BMU",
                 "SEND_SENTENCES_TO_DB"
             ],
-            "large_gensim":false
+            "large_gensim": false
         },
         {
             "active": true,
@@ -83,7 +83,7 @@
                 "EXTEND_ARTICLE_DB_WITH_PERSONA",
                 "EXTEND_DB_WITH_BMU"
             ],
-            "large_gensim":true
+            "large_gensim": true
         }
     ],
     "db": {
@@ -97,5 +97,6 @@
     "text_analysis_service": {
         "url": "http://localhost:8092/model",
         "password": "Pqpj3uUvT37dKToGNUapv"
-    }
+    },
+    "arango_import_command": "arangoimport"
 }

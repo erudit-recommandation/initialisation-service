@@ -81,6 +81,7 @@ for corpus in env_variable["corpus"]:
                     databaseName=corpus["database_name"],
                     collectionName=env_variable["db"]["sentencesCollectionName"],
                     viewName=env_variable["db"]["viewName"],
+                    arangoImportCommand=env_variable["arango_import_command"]
                 )
             except Exception as e:
                 print("SEND_SENTENCES_TO_DB failed: ", e)

@@ -107,7 +107,7 @@ def insert_into_db(df, chunksize, collection, updateBMU=False, idproprioIsPandas
     print("---- Done -----")
 
 
-def insert_sentences(directory, arangoURL, username, password, databaseName, collectionName, viewName):
+def insert_sentences(directory, arangoURL, username, password, databaseName, collectionName, viewName, arangoImportCommand="arangoimport"):
     client = ArangoClient(hosts=arangoURL)
     sys_db = client.db("_system", username=username, password=password)
     db = None
@@ -156,14 +156,16 @@ def insert_sentences(directory, arangoURL, username, password, databaseName, col
     elif "arangodb.cloud" in arangoURL:
         arangoURL = arangoURL.replace("https", "ssl")
 
-    command = 'arangoimport --server.endpoint {db_url} \
+    command = '{arangoImportCommand} --server.endpoint {db_url} \
     --server.username root --server.password="{password}" --server.database="{database}"\
     --file "{csv}" --type csv --collection "{collection}" --datatype idproprio=string \
-    --datatype index_nm=number --datatype text=string --separator=";" --auto-rate-limit'.format(password=password,
-                                                                                                database=databaseName,
-                                                                                                collection=collectionName,
-                                                                                                db_url=arangoURL,
-                                                                                                csv=path)
+    --datatype index_nm=number --datatype text=string --separator=";" --auto-rate-limit'.format(
+        arangoImportCommand=arangoImportCommand,
+        password=password,
+        database=databaseName,
+        collection=collectionName,
+        db_url=arangoURL,
+        csv=path)
     stream = os.popen(command)
     output = stream.read()
     print(output)
