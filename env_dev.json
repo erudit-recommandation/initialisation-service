@@ -26,7 +26,7 @@
             "large_gensim":true
         },
         {
-            "active": true,
+            "active": false,
             "name": "Théorie de l'architecture française",
             "database_name": "libraryFr",
             "working_data": {
@@ -39,12 +39,14 @@
                 ]
             },
             "steps": [
-                "SEND_GENSIM_TO_SERVER"
+                "SEND_ARTICLE_TO_DB",
+                "EXTEND_ARTICLE_DB_WITH_PERSONA",
+                "EXTEND_DB_WITH_BMU"
             ],
             "large_gensim":false
         },
         {
-            "active": true,
+            "active": false,
             "name": "Théorie de l'architecture anglaise",
             "database_name": "libraryEng",
             "working_data": {
@@ -57,7 +59,10 @@
                 ]
             },
             "steps": [
-                "SEND_GENSIM_TO_SERVER"
+                "SEND_ARTICLE_TO_DB",
+                "EXTEND_ARTICLE_DB_WITH_PERSONA",
+                "EXTEND_DB_WITH_BMU",
+                "SEND_SENTENCES_TO_DB"
             ],
             "large_gensim":false
         },
@@ -74,7 +79,9 @@
                 ]
             },
             "steps": [
-                "SEND_GENSIM_TO_SERVER"
+                "SEND_ARTICLE_TO_DB",
+                "EXTEND_ARTICLE_DB_WITH_PERSONA",
+                "EXTEND_DB_WITH_BMU"
             ],
             "large_gensim":true
         }

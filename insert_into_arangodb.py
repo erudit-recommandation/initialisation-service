@@ -12,22 +12,28 @@ def delete_badly_formated_articles(row):
     return row["idproprio"] == "47054ac" or row["idproprio"] == "010109ar"
 
 
-def convert_df_to_arango(cols, row, i):
+def convert_df_to_arango(cols, row, i, idproprioIsPandas=False):
     doc = {}
     if delete_badly_formated_articles(row):
         return None
     for c in cols:
         if row[c] == None:
             pass
-        elif c=="date":
-            doc["annee"] = row[c]
+        elif c == "date":
+            try:
+                doc["annee"] = int(row[c])
+            except:
+                pass
+
         elif c == "sstitrerev":
             sstitrerev = row[c]
             sstitrerev = sstitrerev.split(" •")
             sstitrerev = [rev if rev[0] != " " else rev[1:]
                           for rev in sstitrerev]
             doc[c] = sstitrerev
-        elif c=="idproprio":
+        elif idproprioIsPandas and c == "idproprio":
+            doc[c] = str(i)
+        elif c == "idproprio":
             doc[c] = str(row[c])
 
         else:
@@ -36,7 +42,7 @@ def convert_df_to_arango(cols, row, i):
     return doc
 
 
-def insert_articles(directory, cols, arangoURL, username, password, databaseName, collectionName, viewName, raw=False):
+def insert_articles(directory, cols, arangoURL, username, password, databaseName, collectionName, viewName, idproprioIsPandas):
 
     client = ArangoClient(hosts=arangoURL)
     sys_db = client.db("_system", username=username, password=password)
@@ -57,27 +63,20 @@ def insert_articles(directory, cols, arangoURL, username, password, databaseName
         collection.add_persistent_index(fields=["bmu"])
         collection.add_persistent_index(fields=["pandas_index"], unique=True)
 
-    chunksize = 1000
+    chunksize = 10000
+    path = os.path.join(directory, "doc_parse.csv")
+    df = pd.read_csv(path, encoding='utf-8', chunksize=chunksize, usecols=cols,
+                     sep=';', lineterminator='\n', index_col=False)
 
-    df = None
-    if raw:
-        path = Path('{}/doc_parse.csv'.format(directory))
-        df = pd.read_csv(path, encoding='utf-8', chunksize=chunksize, usecols=cols,
-                         sep=';', lineterminator='\n', index_col=False)
-    else:
-        cols.extend(["bmu", "som_persona"])
-
-        path = Path('{}/doc_parse_extended.csv'.format(directory))
-        df = pd.read_csv(path, encoding='utf-8', chunksize=chunksize, usecols=cols,
-                         sep=',', lineterminator='\n', index_col=False)
     insert_into_db(df, chunksize, collection)
 
 
-def insert_into_db(df, chunksize, collection, updateBMU=False):
+def insert_into_db(df, chunksize, collection, updateBMU=False, idproprioIsPandas=False):
 
     notice_freq = 1000
     nDocumentAdded = 0
     i = 0
+    print("idproprio is pandas_index ", idproprioIsPandas)
 
     with df as reader:
         for chunk in reader:
@@ -85,19 +84,21 @@ def insert_into_db(df, chunksize, collection, updateBMU=False):
             chunk.replace({np.nan: None}, inplace=True)
             cols = list(chunk.columns)
             for (_, row) in chunk.iterrows():
-                doc = convert_df_to_arango(cols, row, i)
+                doc = convert_df_to_arango(
+                    cols, row, i, idproprioIsPandas=idproprioIsPandas)
                 if doc is None:
                     print("A badly formated article")
                 else:
                     try:
                         if updateBMU:
-                            query, update= {'idproprio': doc["idproprio"]}, {'bmu': int(doc["key_bmu"])}
+                            query, update = {'idproprio': str(doc["idproprio"])}, {
+                                'bmu': int(doc["key_bmu"])}
                             collection.update_match(query, update)
                         else:
                             collection.insert(doc)
                     except Exception as e:
                         print(
-                            "---an error happen when inserting with error {} with document {}---".format(e, i))
+                            "---an error happen when inserting with error {} with document {}---".format(e, doc))
                     finally:
                         nDocumentAdded += 1
                     if nDocumentAdded % notice_freq == 0:
@@ -141,12 +142,31 @@ def insert_sentences(directory, arangoURL, username, password, databaseName, col
                            }
                        })
 
+    path = Path('{}/doc_sent_parse.csv'.format(directory))
+
+    """
     chunksize = 1000
     cols = ["idproprio", "text", "index_nm"]
-    path = Path('{}/doc_sent_parse.csv'.format(directory))
     df = pd.read_csv(path, encoding='utf-8', chunksize=chunksize,
                      sep=';', lineterminator='\n', index_col=False, usecols=cols)
     insert_into_db(df, chunksize, collection)
+    """
+    if "localhost" in arangoURL:
+        arangoURL = arangoURL.replace("http", "http+tcp")
+    elif "arangodb.cloud" in arangoURL:
+        arangoURL = arangoURL.replace("https", "ssl")
+
+    command = 'arangoimport --server.endpoint {db_url} \
+    --server.username root --server.password="{password}" --server.database="{database}"\
+    --file "{csv}" --type csv --collection "{collection}" --datatype idproprio=string \
+    --datatype index_nm=number --datatype text=string --separator=";" --auto-rate-limit'.format(password=password,
+                                                                                                database=databaseName,
+                                                                                                collection=collectionName,
+                                                                                                db_url=arangoURL,
+                                                                                                csv=path)
+    stream = os.popen(command)
+    output = stream.read()
+    print(output)
 
 
 def insert_images(directory, arangoURL, username, password, databaseName, collectionName, img_repertory, idproprioImages=False):
@@ -177,8 +197,8 @@ def insert_images(directory, arangoURL, username, password, databaseName, collec
                 img_name_split = img.split(".")
                 pandas_index = int(img_name_split[0])
                 if idproprioImages:
-                    pandas_index-=1
-                    
+                    pandas_index -= 1
+
                 collection.update_match(
                     {'pandas_index': pandas_index}, {'persona_svg': svg})
                 if nDocumentAdded % notice_freq == 0:

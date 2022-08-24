@@ -54,6 +54,9 @@ for corpus in env_variable["corpus"]:
 
         if "SEND_ARTICLE_TO_DB" in corpus["steps"] or "SEND_ALL" in corpus["steps"]:
             try:
+                idproprioIsPandas = True
+                if corpus["name"] == "érudit":
+                    idproprioIsPandasu = False
                 insert_articles(
                     directory=directory,
                     cols=corpus["working_data"]["doc_parse_cols"],
@@ -63,7 +66,7 @@ for corpus in env_variable["corpus"]:
                     databaseName=corpus["database_name"],
                     collectionName=env_variable["db"]["collectionName"],
                     viewName=env_variable["db"]["viewName"],
-                    raw=True,
+                    idproprioIsPandas=idproprioIsPandas
                 )
             except Exception as e:
                 print("SEND_ARTICLE_TO_DB failed: ", e)
@@ -122,6 +125,6 @@ for corpus in env_variable["corpus"]:
                 directory = corpus["working_data"]["directory"]
             )
             if not sended:
-                raise Exception("was not able to send the model to the server")
+                print("was not able to send the model to the server")
         print("----------------------- DONE {} -----------------------".format(corpus["name"]))
 print("--- LEAVING ---")
