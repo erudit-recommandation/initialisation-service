@@ -13,7 +13,7 @@ L'application est gérée par les fichiers `env.json` ou `env_dev.json`, ceux ca
 - "SEND_SENTENCES_TO_DB" => envoie les phrase à la base de donnée
 - "EXTEND_ARTICLE_DB_WITH_PERSONA" => Ajoutes les images des persona dans la base de données
 - "EXTEND_DB_WITH_BMU"=> Ajoutes les bmu dans la base de données
-- 
+
 `import_sentences_mode` offre plusieurs option afin d'insérer les phrases dans la base de données
 - "ONE_BY_ONE" => insère les phrases une par une par, très lent (les articles et bmu sont insérés un par un, par contre leurs jeux de données sont beaucoup plus petits, une amélioration possible serait d'implémenté les modes d'importation également pour ces collections)
 - "BULK" => insère les phrases en lot, c'est à dire insert d'un coup le segment (chunksize) du fichier `csv` dansla base de donnée
