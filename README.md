@@ -75,19 +75,19 @@ Afin de lancer l'application, il suffit de simplement exécuter la commande `mak
         "url": "http://localhost:8529", // addresse de la base de données
         "username": "root", // nom de la base de données toujours root, pas besoin de le changer
         "password": "rootpassword", // mot de passe de la base de données
-        "collectionName": "articles", // nom de la collection des articles, l'application brise si changer
-        "sentencesCollectionName": "sentences", // nom de la collection des phrases, l'application brise si changer
-        "viewName": "article_analysis"// nom de la vue des phrases, l'application brise si changer
+        "collectionName": "articles", // nom de la collection des articles, l'application brise si changé
+        "sentencesCollectionName": "sentences", // nom de la collection des phrases, l'application brise si changé
+        "viewName": "article_analysis"// nom de la vue des phrases, l'application brise si changé
     },
     "text_analysis_service": {
         "url": "http://localhost:8092/model", // addresse du service d'analyse de texte avec gemsim doit inclure la route `/model`
         "password": "Pqpj3uUvT37dKToGNUapv" // mot de passe du service
     },
-    "import_sentences_mode": { // mode d'insertion des phrase voir usage
+    "import_sentences_mode": { // mode d'insertion des phrases voir usage
         "mode": "BULK", // nom du mode
-        "chunksize": 2000, // taille des segments de la base de données seulement utiliser avec les mode `ONE_BY_ONE` et `BULK` est ignorer avec `ARANGO_IMPORT`
-        "arango_import_command": "arangoimport" // commande d'arango import est ignorer par tous les modes sauf ARANGO_IMPORT
+        "chunksize": 2000, // taille des segments de la base de données seulement utilisé avec les mode `ONE_BY_ONE` et `BULK`, est ignorer avec `ARANGO_IMPORT`
+        "arango_import_command": "arangoimport" // commande d'arango import est ignoré par tous les modes sauf ARANGO_IMPORT
     },
-    "chunksize": 2000 // taille des segments de la base de données plus il sont gros plus l'insertion est rapide, mais également plus les opérations demande de ressources
+    "chunksize": 2000 // taille des segments de la base de données, plus ils sont gros plus l'insertion est rapide, mais nécéssite plus de ressources
 }
 ```
