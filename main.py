@@ -66,7 +66,8 @@ for corpus in env_variable["corpus"]:
                     databaseName=corpus["database_name"],
                     collectionName=env_variable["db"]["collectionName"],
                     viewName=env_variable["db"]["viewName"],
-                    idproprioIsPandas=idproprioIsPandas
+                    idproprioIsPandas=idproprioIsPandas,
+                    chunksize=env_variable["chunksize"]
                 )
             except Exception as e:
                 print("SEND_ARTICLE_TO_DB failed: ", e)
@@ -81,7 +82,7 @@ for corpus in env_variable["corpus"]:
                     databaseName=corpus["database_name"],
                     collectionName=env_variable["db"]["sentencesCollectionName"],
                     viewName=env_variable["db"]["viewName"],
-                    arangoImportCommand=env_variable["arango_import_command"]
+                    mode=env_variable["import_sentences_mode"]
                 )
             except Exception as e:
                 print("SEND_SENTENCES_TO_DB failed: ", e)
@@ -113,6 +114,7 @@ for corpus in env_variable["corpus"]:
                     password=env_variable["db"]["password"],
                     databaseName=corpus["database_name"],
                     collectionName=env_variable["db"]["collectionName"],
+                    chunksize=env_variable["chunksize"]
                 )
             except Exception as e:
                 print("EXTEND_DB_WITH_BMU failed: ", e)
@@ -123,9 +125,10 @@ for corpus in env_variable["corpus"]:
                 password=env_variable["text_analysis_service"]["password"],
                 largeModel=corpus["large_gensim"],
                 database_name=corpus["database_name"],
-                directory = corpus["working_data"]["directory"]
+                directory=corpus["working_data"]["directory"]
             )
             if not sended:
                 print("was not able to send the model to the server")
-        print("----------------------- DONE {} -----------------------".format(corpus["name"]))
+        print(
+            "----------------------- DONE {} -----------------------".format(corpus["name"]))
 print("--- LEAVING ---")

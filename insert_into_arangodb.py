@@ -42,7 +42,7 @@ def convert_df_to_arango(cols, row, i, idproprioIsPandas=False):
     return doc
 
 
-def insert_articles(directory, cols, arangoURL, username, password, databaseName, collectionName, viewName, idproprioIsPandas):
+def insert_articles(directory, cols, arangoURL, username, password, databaseName, collectionName, viewName, idproprioIsPandas,chunksize):
 
     client = ArangoClient(hosts=arangoURL)
     sys_db = client.db("_system", username=username, password=password)
@@ -63,7 +63,6 @@ def insert_articles(directory, cols, arangoURL, username, password, databaseName
         collection.add_persistent_index(fields=["bmu"])
         collection.add_persistent_index(fields=["pandas_index"], unique=True)
 
-    chunksize = 10000
     path = os.path.join(directory, "doc_parse.csv")
     df = pd.read_csv(path, encoding='utf-8', chunksize=chunksize, usecols=cols,
                      sep=';', lineterminator='\n', index_col=False)
@@ -71,7 +70,7 @@ def insert_articles(directory, cols, arangoURL, username, password, databaseName
     insert_into_db(df, chunksize, collection)
 
 
-def insert_into_db(df, chunksize, collection, updateBMU=False, idproprioIsPandas=False):
+def insert_into_db(df, chunksize, collection,updateBMU=False, idproprioIsPandas=False,):
 
     notice_freq = 1000
     nDocumentAdded = 0
@@ -107,7 +106,7 @@ def insert_into_db(df, chunksize, collection, updateBMU=False, idproprioIsPandas
     print("---- Done -----")
 
 
-def insert_sentences(directory, arangoURL, username, password, databaseName, collectionName, viewName, arangoImportCommand="arangoimport"):
+def insert_sentences(directory, arangoURL, username, password, databaseName, collectionName, viewName, mode):
     client = ArangoClient(hosts=arangoURL)
     sys_db = client.db("_system", username=username, password=password)
     db = None
@@ -143,32 +142,53 @@ def insert_sentences(directory, arangoURL, username, password, databaseName, col
                        })
 
     path = Path('{}/doc_sent_parse.csv'.format(directory))
+    if mode["mode"]=="ONE_BY_ONE":
+        chunksize = mode["chunksize"]
+        cols = ["idproprio", "text", "index_nm", "pandas_index"]
+        df = pd.read_csv(path, encoding='utf-8', chunksize=chunksize,
+                        sep=';', lineterminator='\n', index_col=False, usecols=cols)
+        insert_into_db(df, chunksize, collection)
+        
+    elif mode["mode"] =="BULK":
+        chunksize = mode["chunksize"]
+        cols = ["idproprio", "text", "index_nm"]
+        df = pd.read_csv(path, encoding='utf-8', chunksize=chunksize,
+                        sep=';', lineterminator='\n', index_col=False, usecols=cols)
+        with df as reader:
+            for chunk in reader:
+                chunk.reset_index(inplace=True)
+                chunk.replace({np.nan: None}, inplace=True)
+                chunk["idproprio"] = chunk["idproprio"].astype("string")
 
-    """
-    chunksize = 1000
-    cols = ["idproprio", "text", "index_nm"]
-    df = pd.read_csv(path, encoding='utf-8', chunksize=chunksize,
-                     sep=';', lineterminator='\n', index_col=False, usecols=cols)
-    insert_into_db(df, chunksize, collection)
-    """
-    if "localhost" in arangoURL:
-        arangoURL = arangoURL.replace("http", "http+tcp")
-    elif "arangodb.cloud" in arangoURL:
-        arangoURL = arangoURL.replace("https", "ssl")
+                tempDocs = chunk.to_dict('records')
+                docs = []
+                for t in tempDocs:
+                    t["pandas_index"] = t.pop("index")
+                    docs.append(t)
+                collection.import_bulk(docs, halt_on_error=False,details=False)
+                
+                    
+        
+    elif mode["mode"] =="ARANGO_IMPORT":
+    
+        if "localhost" in arangoURL:
+            arangoURL = arangoURL.replace("http", "http+tcp")
+        elif "arangodb.cloud" in arangoURL:
+            arangoURL = arangoURL.replace("https", "ssl")
 
-    command = '{arangoImportCommand} --server.endpoint {db_url} \
-    --server.username root --server.password="{password}" --server.database="{database}"\
-    --file "{csv}" --type csv --collection "{collection}" --datatype idproprio=string \
-    --datatype index_nm=number --datatype text=string --separator=";" --auto-rate-limit'.format(
-        arangoImportCommand=arangoImportCommand,
-        password=password,
-        database=databaseName,
-        collection=collectionName,
-        db_url=arangoURL,
-        csv=path)
-    stream = os.popen(command)
-    output = stream.read()
-    print(output)
+        command = '{arangoImportCommand} --server.endpoint {db_url} \
+        --server.username root --server.password="{password}" --server.database="{database}"\
+        --file "{csv}" --type csv --collection "{collection}" --datatype idproprio=string \
+        --datatype index_nm=number --datatype text=string --separator=";" --auto-rate-limit'.format(
+            arangoImportCommand=mode["arango_import_command"],
+            password=password,
+            database=databaseName,
+            collection=collectionName,
+            db_url=arangoURL,
+            csv=path)
+        stream = os.popen(command)
+        output = stream.read()
+        print(output)
 
 
 def insert_images(directory, arangoURL, username, password, databaseName, collectionName, img_repertory, idproprioImages=False):
@@ -215,7 +235,7 @@ def insert_images(directory, arangoURL, username, password, databaseName, collec
             f.write(json_object)
 
 
-def insert_bmu(directory, arangoURL, username, password, databaseName, collectionName):
+def insert_bmu(directory, arangoURL, username, password, databaseName, chunksize,collectionName):
     client = ArangoClient(hosts=arangoURL)
     sys_db = client.db("_system", username=username, password=password)
     db = None
@@ -229,7 +249,6 @@ def insert_bmu(directory, arangoURL, username, password, databaseName, collectio
         collection = db.collection(collectionName)
     else:
         raise Exception("collection don't exist")
-    chunksize = 1000
 
     path = Path('{}/key_host_bmus.csv'.format(directory))
     df = pd.read_csv(path, encoding='utf-8', chunksize=chunksize,

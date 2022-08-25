@@ -26,7 +26,7 @@
             "large_gensim": true
         },
         {
-            "active": false,
+            "active": true,
             "name": "Théorie de l'architecture française",
             "database_name": "libraryFr",
             "working_data": {
@@ -39,9 +39,7 @@
                 ]
             },
             "steps": [
-                "SEND_ARTICLE_TO_DB",
-                "EXTEND_ARTICLE_DB_WITH_PERSONA",
-                "EXTEND_DB_WITH_BMU"
+                "SEND_SENTENCES_TO_DB"
             ],
             "large_gensim": false
         },
@@ -67,7 +65,7 @@
             "large_gensim": false
         },
         {
-            "active": true,
+            "active": false,
             "name": "Xenotheka",
             "database_name": "xenotheka",
             "working_data": {
@@ -79,9 +77,7 @@
                 ]
             },
             "steps": [
-                "SEND_ARTICLE_TO_DB",
-                "EXTEND_ARTICLE_DB_WITH_PERSONA",
-                "EXTEND_DB_WITH_BMU"
+                "SEND_SENTENCES_TO_DB"
             ],
             "large_gensim": true
         }
@@ -98,5 +94,10 @@
         "url": "http://localhost:8092/model",
         "password": "Pqpj3uUvT37dKToGNUapv"
     },
-    "arango_import_command": "arangoimport"
+    "import_sentences_mode": {
+        "mode": "ONE_BY_ONE",
+        "chunksize": 2000,
+        "arango_import_command":"arangoimport"
+    },
+    "chunksize": 2000
 }
