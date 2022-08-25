@@ -7,17 +7,19 @@ Les dépendances sont dans le fichier `requirement.txt`, ainsi que le module `fr
 
 # Usage
 L'application est gérée par les fichiers `env.json` ou `env_dev.json`, ceux caractérise la construction des modèles et leur déploiement dans les services. Le champ `step` gère les opérations que l'application va effectuer les choix sont les suivants et l'ordre n'a pas d'importance: 
+
 - "SEND_GENSIM_TO_SERVER" => envoie le modèle `gensim` au serveur
 - "SEND_ARTICLE_TO_DB" => envoie les articles et les informations qui s'y rattachent dans la base de données
 - "SEND_ALL" => effectue toutes les opérations
-- "SEND_SENTENCES_TO_DB" => envoie les phrase à la base de donnée
-- "EXTEND_ARTICLE_DB_WITH_PERSONA" => Ajoutes les images des persona dans la base de données
-- "EXTEND_DB_WITH_BMU"=> Ajoutes les bmu dans la base de données
+- "SEND_SENTENCES_TO_DB" => envoie les phrases à la base de données
+- "EXTEND_ARTICLE_DB_WITH_PERSONA" => ajoute les images des persona dans la base de données
+- "EXTEND_DB_WITH_BMU"=> ajoute les bmu dans la base de données
 
-`import_sentences_mode` offre plusieurs option afin d'insérer les phrases dans la base de données
+`import_sentences_mode` offre plusieurs options afin d'insérer les phrases dans la base de données:
+
 - "ONE_BY_ONE" => insère les phrases une par une par, très lent (les articles et bmu sont insérés un par un, par contre leurs jeux de données sont beaucoup plus petits, une amélioration possible serait d'implémenté les modes d'importation également pour ces collections)
-- "BULK" => insère les phrases en lot, c'est à dire insert d'un coup le segment (chunksize) du fichier `csv` dansla base de donnée
-- "ARANGO_IMPORT" => le mode le plus rapide qui donne à la base de donnée tous le `cvs` d'un coup et lui laisse faire la gestion de l'importation, par contre ce mode à tendance à mal fonctionner
+- "BULK" => insère les phrases en lot, c'est-à-dire l'insertion d'un coup de segments (chunksize) du fichier `csv` dans la base de données
+- "ARANGO_IMPORT" => insère tout le `cvs` d'un coup et laisse la base de données faire la gestion de l'importation. Ce mode est le plus rapide, par contre ce mode a tendance a mal fonctionné.
 
 Afin de lancer l'application, il suffit de simplement exécuter la commande `make run` afin de la configuration de développement (`env_dev.json`), pour lancer l'application en mode déploiement il faut lancer la commande `make run-deploy`.
 
