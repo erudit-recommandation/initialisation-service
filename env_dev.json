@@ -23,7 +23,8 @@
             "steps": [
                 "EXTEND_ARTICLE_DB_WITH_PERSONA"
             ],
-            "large_gensim": true
+            "large_gensim": true,
+            "language": "english"
         },
         {
             "active": true,
@@ -39,14 +40,15 @@
                 ]
             },
             "steps": [
-                "SEND_SENTENCES_TO_DB"
+                "SEND_GENSIM_TO_SERVER"
             ],
-            "large_gensim": false
+            "large_gensim": false,
+            "language": "french"
         },
         {
             "active": false,
             "name": "Théorie de l'architecture anglaise",
-            "database_name": "libraryEng",
+            "database_name": "libraryenglish",
             "working_data": {
                 "directory": "./data/Library EN",
                 "doc_parse_cols": [
@@ -62,7 +64,8 @@
                 "EXTEND_DB_WITH_BMU",
                 "SEND_SENTENCES_TO_DB"
             ],
-            "large_gensim": false
+            "large_gensim": false,
+            "language": "english"
         },
         {
             "active": false,
@@ -79,7 +82,8 @@
             "steps": [
                 "SEND_SENTENCES_TO_DB"
             ],
-            "large_gensim": true
+            "large_gensim": true,
+            "language": "english"
         }
     ],
     "db": {
@@ -97,7 +101,7 @@
     "import_sentences_mode": {
         "mode": "ONE_BY_ONE",
         "chunksize": 2000,
-        "arango_import_command":"arangoimport"
+        "arango_import_command": "arangoimport"
     },
     "chunksize": 2000
 }

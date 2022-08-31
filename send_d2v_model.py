@@ -2,12 +2,14 @@ import requests
 from pathlib import Path
 
 
-def send_d2v_model(url, directory, password, largeModel, database_name):
+def send_d2v_model(url, directory, password, largeModel, database_name, language):
     model = open(Path("{}/model/d2v.model".format(directory)), 'rb')
     files = None
     if largeModel:
-        syn1neg = open(Path("{}/model/d2v.model.syn1neg.npy".format(directory)), 'rb')
-        vectors = open(Path("{}/model/d2v.model.wv.vectors.npy".format(directory)), 'rb')
+        syn1neg = open(
+            Path("{}/model/d2v.model.syn1neg.npy".format(directory)), 'rb')
+        vectors = open(
+            Path("{}/model/d2v.model.wv.vectors.npy".format(directory)), 'rb')
 
         files = {
             'd2v.model': model,
@@ -21,8 +23,9 @@ def send_d2v_model(url, directory, password, largeModel, database_name):
 
     obj = {
         "password": password,
+        "language": language
     }
-    url = "{}/{}".format(url,database_name)
+    url = "{}/{}".format(url, database_name)
     r = requests.post(url, files=files, data=obj)
 
     return r.status_code == requests.codes.ok

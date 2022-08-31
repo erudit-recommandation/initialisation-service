@@ -125,7 +125,8 @@ for corpus in env_variable["corpus"]:
                 password=env_variable["text_analysis_service"]["password"],
                 largeModel=corpus["large_gensim"],
                 database_name=corpus["database_name"],
-                directory=corpus["working_data"]["directory"]
+                directory=corpus["working_data"]["directory"],
+                language=corpus["language"]
             )
             if not sended:
                 print("was not able to send the model to the server")
