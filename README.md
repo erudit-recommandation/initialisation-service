@@ -50,7 +50,8 @@ Afin de lancer l'application, il suffit de simplement exécuter la commande `mak
             "steps": [ // étape du déploiement à exécuter, l'ordre n'a pas d'importance, voir la section Usage pour plus d'information
                 "EXTEND_ARTICLE_DB_WITH_PERSONA" 
             ],
-            "large_gensim": true // est-ce que le modèle gensim est sur plusieur fichier (`.syn1neg.npy et wv.vectors.npy`)
+            "large_gensim": true, // est-ce que le modèle gensim est sur plusieur fichier (`.syn1neg.npy et wv.vectors.npy`)
+            "language": "french" // langue du corpus
         },
         {
             "active": true,
@@ -68,7 +69,8 @@ Afin de lancer l'application, il suffit de simplement exécuter la commande `mak
             "steps": [
                 "SEND_SENTENCES_TO_DB"
             ],
-            "large_gensim": false
+            "large_gensim": false,
+            "language": "french"
         }
     ],
     "db": {
